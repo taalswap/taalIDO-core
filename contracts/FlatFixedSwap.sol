@@ -11,13 +11,9 @@ pragma solidity 0.5.8;
  */
 contract ERC20Basic {
     function decimals() public view returns (uint8);
-
     function totalSupply() public view returns (uint256);
-
     function balanceOf(address who) public view returns (uint256);
-
     function transfer(address to, uint256 value) public returns (bool);
-
     event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
@@ -184,11 +180,8 @@ library SafeMath {
  */
 contract ERC20 is ERC20Basic {
     function allowance(address owner, address spender) public view returns (uint256);
-
     function transferFrom(address from, address to, uint256 value) public returns (bool);
-
     function approve(address spender, uint256 value) public returns (bool);
-
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
@@ -202,7 +195,6 @@ contract ERC20 is ERC20Basic {
 contract Ownable {
     address public owner;
     address public proposedOwner;
-
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
 
@@ -292,13 +284,13 @@ contract Whitelist is Ownable {
     event RemovedFromWhitelist(address indexed account);
 
     modifier onlyWhitelisted() {
-        if (hasWhitelisting) {
+        if(hasWhitelisting){
             require(isWhitelisted(msg.sender));
         }
         _;
     }
 
-    constructor (bool _hasWhitelisting) public {
+    constructor (bool _hasWhitelisting) public{
         hasWhitelisting = _hasWhitelisting;
     }
 
@@ -318,11 +310,11 @@ contract Whitelist is Ownable {
         emit RemovedFromWhitelist(_address);
     }
 
-    function getWhitelistedAddresses() public view returns (address[] memory) {
+    function getWhitelistedAddresses() public view returns(address[] memory) {
         return whitelistedAddresses;
     }
 
-    function isWhitelisted(address _address) public view returns (bool) {
+    function isWhitelisted(address _address) public view returns(bool) {
         return whitelist[_address];
     }
 }
@@ -349,8 +341,8 @@ contract FixedSwap is Pausable, Whitelist {
     uint256 public tokensAllocated = 0; /* Tokens Available for Allocation - Dynamic */
     uint256 public tokensForSale = 0; /* Tokens Available for Sale */
     bool    public isTokenSwapAtomic; /* Make token release atomic or not */
-    address payable public FEE_ADDRESS = 0xC689a37B4e7Cf714103631Fd8A14911BfFf3A1dD; /* Default Address for Fee Percentage */
-    uint256 public feePercentage = 10; /* Default Fee 10% */
+    address payable public FEE_ADDRESS = 0xAEb39b67F27b641Ef9F95fB74F1A46b1EE4Efc83; /* Default Address for Fee Percentage */
+    uint256 public feePercentage = 1; /* Default Fee 1% */
 
     struct Purchase {
         uint256 amount;
@@ -388,7 +380,7 @@ contract FixedSwap is Pausable, Whitelist {
         individualMaximumAmount = _individualMaximumAmount;
         isTokenSwapAtomic = _isTokenSwapAtomic;
 
-        if (!_isTokenSwapAtomic) {/* If raise is not atomic swap */
+        if(!_isTokenSwapAtomic){ /* If raise is not atomic swap */
             minimumRaise = _minimumRaise;
         }
 
@@ -468,7 +460,7 @@ contract FixedSwap is Pausable, Whitelist {
 
     /* Verify if minimum raise was achieved */
     function minimumRaiseAchieved() public view returns (bool){
-        if (hasMinimumRaise()) {
+        if(hasMinimumRaise()){
             require(cost(tokensAllocated) >= cost(minimumRaise), "TotalRaise is less than minimum raise amount");
         }
         return true;
@@ -495,7 +487,7 @@ contract FixedSwap is Pausable, Whitelist {
     }
 
     function cost(uint256 _amount) public view returns (uint){
-        return _amount.mul(tradeValue).div(10 ** decimals);
+        return _amount.mul(tradeValue).div(10**decimals);
     }
 
     function getPurchase(uint256 _purchase_id) external view returns (uint256, address, uint256, uint256, bool, bool){
@@ -503,15 +495,15 @@ contract FixedSwap is Pausable, Whitelist {
         return (purchase.amount, purchase.purchaser, purchase.ethAmount, purchase.timestamp, purchase.wasFinalized, purchase.reverted);
     }
 
-    function getPurchaseIds() public view returns (uint256[] memory) {
+    function getPurchaseIds() public view returns(uint256[] memory) {
         return purchaseIds;
     }
 
-    function getBuyers() public view returns (address[] memory) {
+    function getBuyers() public view returns(address[] memory) {
         return buyers;
     }
 
-    function getMyPurchases(address _address) public view returns (uint256[] memory) {
+    function getMyPurchases(address _address) public view returns(uint256[] memory) {
         return myPurchases[_address];
     }
 
@@ -525,7 +517,7 @@ contract FixedSwap is Pausable, Whitelist {
         require(erc20.transferFrom(msg.sender, address(this), _amount), "Failed ERC20 token transfer");
 
         /* If Amount is equal to needed - sale is ready */
-        if (availableTokens() == tokensForSale) {
+        if(availableTokens() == tokensForSale){
             isSaleFunded = true;
         }
     }
@@ -557,7 +549,7 @@ contract FixedSwap is Pausable, Whitelist {
         }
         require(purchaserTotalAmountPurchased.add(_amount) <= individualMaximumAmount, "Address has already passed the max amount of swap");
 
-        if (isTokenSwapAtomic) {
+        if(isTokenSwapAtomic){
             /* Confirm transfer */
             require(erc20.transfer(msg.sender, _amount), "ERC20 transfer didn´t work");
         }
@@ -599,31 +591,29 @@ contract FixedSwap is Pausable, Whitelist {
     /* Admin Functions */
     function withdrawFunds() external onlyOwner whenNotPaused isSaleFinalized {
         require(minimumRaiseAchieved(), "Minimum raise has to be reached");
-        FEE_ADDRESS.transfer(address(this).balance.mul(feePercentage).div(100));
-        /* Fee Address */
+        FEE_ADDRESS.transfer(address(this).balance.mul(feePercentage).div(100)); /* Fee Address */
         msg.sender.transfer(address(this).balance);
     }
 
     function withdrawUnsoldTokens() external onlyOwner isSaleFinalized {
         require(!unsoldTokensReedemed);
         uint256 unsoldTokens;
-        if (hasMinimumRaise() &&
-            (cost(tokensAllocated) < cost(minimumRaise))) {/* Minimum Raise not reached */
+        if(hasMinimumRaise() &&
+            (cost(tokensAllocated) < cost(minimumRaise))){ /* Minimum Raise not reached */
             unsoldTokens = tokensForSale;
-        } else {
+        }else{
             /* If minimum Raise Achieved Redeem All Tokens minus the ones */
             unsoldTokens = tokensForSale.sub(tokensAllocated);
         }
 
-        if (unsoldTokens > 0) {
+        if(unsoldTokens > 0){
             unsoldTokensReedemed = true;
             require(erc20.transfer(msg.sender, unsoldTokens), "ERC20 transfer failed");
         }
     }
 
     function removeOtherERC20Tokens(address _tokenAddress, address _to) external onlyOwner isSaleFinalized {
-        require(_tokenAddress != address(erc20), "Token Address has to be diff than the erc20 subject to sale");
-        // Confirm tokens addresses are different from main sale one
+        require(_tokenAddress != address(erc20), "Token Address has to be diff than the erc20 subject to sale"); // Confirm tokens addresses are different from main sale one
         ERC20 erc20Token = ERC20(_tokenAddress);
         require(erc20Token.transfer(_to, erc20Token.balanceOf(address(this))), "ERC20 Token transfer failed");
     }
