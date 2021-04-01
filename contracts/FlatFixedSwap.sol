@@ -341,9 +341,9 @@ contract FixedSwap is Pausable, Whitelist {
     uint256 public tokensAllocated = 0; /* Tokens Available for Allocation - Dynamic */
     uint256 public tokensForSale = 0; /* Tokens Available for Sale */
     bool    public isTokenSwapAtomic; /* Make token release atomic or not */
-    address payable public FEE_ADDRESS = 0xAEb39b67F27b641Ef9F95fB74F1A46b1EE4Efc83; /* Default Address for Fee Percentage */
-    uint256 public feePercentage = 1; /* Default Fee 1% */
-
+    /* TODO : 수수료 지갑 주소 반드시 변경할 것 */
+    address payable public FEE_ADDRESS = 0xa42f6EE885e29a6915269B34e249f2a1c0A26955; /* Default Address for Fee Percentage */
+    uint256 public feePercentage = 2; /* Default Fee 2% */
     struct Purchase {
         uint256 amount;
         address purchaser;
@@ -368,8 +368,8 @@ contract FixedSwap is Pausable, Whitelist {
         require(_tokensForSale > _individualMinimumAmount, "Tokens for Sale should be > Individual Minimum Amount");
         require(_individualMaximumAmount >= _individualMinimumAmount, "Individual Maximim AMount should be > Individual Minimum Amount");
         require(_minimumRaise <= _tokensForSale, "Minimum Raise should be < Tokens For Sale");
-        require(_feeAmount >= feePercentage, "Fee Percentage has to be >= 1");
-        require(_feeAmount <= 99, "Fee Percentage has to be < 100");
+        require(_feeAmount >= feePercentage, "Fee Percentage has to be >= 2");
+        require(_feeAmount <= 98, "Fee Percentage has to be < 100");
 
         startDate = _startDate;
         endDate = _endDate;
