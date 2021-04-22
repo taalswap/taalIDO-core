@@ -342,7 +342,7 @@ contract FixedSwap is Pausable, Whitelist {
     uint256 public tokensForSale = 0; /* Tokens Available for Sale */
     bool    public isTokenSwapAtomic; /* Make token release atomic or not */
     /* TODO : 수수료 지갑 주소 반드시 변경할 것 */
-    address payable public FEE_ADDRESS = 0xa42f6EE885e29a6915269B34e249f2a1c0A26955; /* Default Address for Fee Percentage */
+    address payable public FEE_ADDRESS = 0xdc926E34E73292cD7c48c6fD7375af7D93435D36; /* Default Address for Fee Percentage */
     uint256 public feePercentage = 2; /* Default Fee 2% */
     struct Purchase {
         uint256 amount;
