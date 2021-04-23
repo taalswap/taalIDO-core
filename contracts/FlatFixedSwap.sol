@@ -362,7 +362,7 @@ contract FixedSwap is Pausable, Whitelist {
 
         /* Confirmations */
         require(block.timestamp < _endDate, "End Date should be further than current date");
-        require(block.timestamp < _startDate, "End Date should be further than current date");
+        require(block.timestamp < _startDate, "Start Date should be further than current date");
         require(_startDate < _endDate, "End Date higher than Start Date");
         require(_tokensForSale > 0, "Tokens for Sale should be > 0");
         require(_tokensForSale > _individualMinimumAmount, "Tokens for Sale should be > Individual Minimum Amount");
